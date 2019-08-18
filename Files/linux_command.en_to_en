@@ -1,0 +1,29 @@
+man	an interface to the on-line reference manuals.
+bash	GNU Bourne-Again SHell.
+cat	concatenate files and print on the standard output.
+mkdir	make directories.
+vim	Vi IMprpved, a programmer's text editor.
+wc	print newline, word, and byte counts for each file.
+head	output the first part of files.
+tail	output the last part of files.
+python	an interpreted, interactive, object-oriented programming language.
+rm	remove files or directories.
+mv	move (rename) files.
+ping	send ICMP ECHO_REQUEST to network hosts.
+echo	display a line of text.
+perl	The Perl 5 language interpreter.
+env	run a program in a modified environment.
+setenv	change or add an environment variable.
+find	search for files in a directory hierarchy.
+ps	report a snapshot of the current processes.
+sort	sort lines of text files.
+xargs	build and execute command lines from standard input.
+ssh	OpenSSH SSH client (remote login program).
+dd	convert and copy a file.
+dig	DNS lookup utility.
+arp	Linux ARP kernel module.
+telnet	user interface to the TELNET protocol.
+kill	send a signal to a process.
+ftp	Internet file transfer program.
+more	file perusal filter for crt viewing.
+less	opposite of more.
