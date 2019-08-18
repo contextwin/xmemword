@@ -95,6 +95,7 @@ unsigned int fp_read_and_split(FILE *fp, struct AnswerAndQuestion *answer_and_qu
   }
   
  }
+
  fclose(fp);
  return question_max;
 }
@@ -184,15 +185,16 @@ unsigned int FpReadAndSplit(FILE *fp, struct AnswerAndQuestion *answer_and_quest
     if (feof(fp)) break;
 
   }
+
  }
+
  fclose(fp);
  return question_max;
 };
 
 
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
  DIR *files_dir;
  FILE *reading_fp;
  struct dirent *files_dp;
@@ -203,8 +205,8 @@ int main(int argc, char **argv)
       user_input_answer[STRINGS_MAX], command_line_str[strlen(EDITOR) + NAME_MAX];
 
  unsigned char cnt = 0, cnt1 = 0,
-              number_of_files = 0,
-              user_input_num = 0;
+               number_of_files = 0,
+               user_input_num = 0;
 
  unsigned short number_of_start_question = 0,
                 number_of_end_question = 0;
@@ -217,13 +219,13 @@ int main(int argc, char **argv)
  Colormap cmap;
 
 
- /* font setting */
+/* font setting */
  Font font1, font2; /* フォントセット */
  int missing_count; /* 存在しない文字集合の数 */
  char** missing_list; /* 存在しない文字集合 */
  char* def_string; /* ↑に対して描画される文字列 */
 
- /* key event */
+/* key event */
  Status status;
  XEvent event;
  KeySym key_sym;
@@ -244,256 +246,254 @@ int main(int argc, char **argv)
  char *error_check_strings1 = "実際の問題の量以上の値か、負の値が入力されました。";
  char *error_check_strings2 = "A number greater than the actual number of file was entered.";
 
- /*出題順序選択画面用*/
+/*出題順序選択画面用*/
  char *order_select_str1 = "(Please input are questions order and enter anumerical value)";
  char *order_select_str2 = "出題の順番を数値で入力して下さい。";
  char *order_select_str3 = "[  1] 一行目から順番に出題する。";
  char *order_select_str4 = "[  2] ランダムに出題する。";
  char *order_select_str5 = "[  3] 解答の文字数が少ない順に出題する。";
  char *order_select_str6 = "[  4} 解答の文字数が少ない順に出題する。";
-
  char question_number_str[256];
 
- /*    method        */
+/*    method        */
  strcat(command_line_str, EDITOR);
-  if (NULL == getcwd(files_dir_path, PATH_MAX)) {
-   printf("カレントディレクトリの取得に失敗しました。 \n");
+
+ if (NULL == getcwd(files_dir_path, PATH_MAX)) {
+  printf("カレントディレクトリの取得に失敗しました。 \n");
+  exit(ERROR);
+ }
+
+ if (PATH_MAX < (strlen(files_dir_path) + strlen(FILES_DIR_NAME))) {
+  printf("出題ファイルまでのパスの長さが PATH_MAX(4096) 以上です。");
+  exit(ERROR);
+ } else {
+  strcat(files_dir_path, FILES_DIR_NAME);
+ }
+
+ for (;;) {
+
+  if (!(files_dir = opendir(files_dir_path))) {
+   printf("%s ディレクトリが存在しません。\n", files_dir_path);
    exit(ERROR);
   }
 
-  if (PATH_MAX < (strlen(files_dir_path) + strlen(FILES_DIR_NAME))) {
-   printf("出題ファイルまでのパスの長さが PATH_MAX(4096) 以上です。");
+// 出題ファイルが格納されているディレクトリまで移動(エラー処理書く)
+  if ((-1) == chdir(files_dir_path)) {
+   printf("%s ディレクトリへの移動に失敗しました。\n", files_dir_path);
    exit(ERROR);
-  } else {
-   strcat(files_dir_path, FILES_DIR_NAME);
-  }
+  };
 
-  for (;;) {
-
-   if (!(files_dir = opendir(files_dir_path))) {
-    printf("%s ディレクトリが存在しません。\n", files_dir_path);
-    exit(ERROR);
-   }
-
-  // 出題ファイルが格納されているディレクトリまで移動(エラー処理書く)
-   if ((-1) == chdir(files_dir_path)) {
-    printf("%s ディレクトリへの移動に失敗しました。\n", files_dir_path);
-    exit(ERROR);
-   };
-
-   for (files_dp = readdir(files_dir), cnt = 0; files_dp != NULL; files_dp = readdir(files_dir)){
+  for (files_dp = readdir(files_dir), cnt = 0; files_dp != NULL; files_dp = readdir(files_dir)) {
     /* . と .. は一覧に代入しない */
-    if ((!strcmp(files_dp->d_name,".")) || (!strcmp(files_dp->d_name,".."))) {
-     continue;
-    }
+   if ((!strcmp(files_dp->d_name,".")) || (!strcmp(files_dp->d_name,".."))) {
+    continue;
+   }
         
-    filelist_s[cnt].file_number = cnt + 1;
-    strcpy(filelist_s[cnt].file_name, files_dp->d_name);
-    cnt++;
-   }
+   filelist_s[cnt].file_number = cnt + 1;
+   strcpy(filelist_s[cnt].file_name, files_dp->d_name);
+   cnt++;
+  }
 
-   closedir(files_dir);
+  closedir(files_dir);
 
-   if (0 == cnt) {
-    printf("出題用のファイルが存在しません。\n%s.\nに出題用のファイルを作成してください。\n", files_dir_path);
-    exit(ERROR);
-   };
+  if (0 == cnt) {
+   printf("出題用のファイルが存在しません。\n%s.\nに出題用のファイルを作成してください。\n", files_dir_path);
+   exit(ERROR);
+  };
 
-   number_of_files = cnt;
+  number_of_files = cnt;
 
-   /* view method */
-   memset(user_input_strings, '\0', sizeof(user_input_strings));
+  /* view method */
+  memset(user_input_strings, '\0', sizeof(user_input_strings));
 
-   if(setlocale(LC_CTYPE, "") == NULL) {
-    printf("Can't set locale\n");
-    exit(EXIT_FAILURE);
-   }
+  if(setlocale(LC_CTYPE, "") == NULL) {
+   printf("Can't set locale\n");
+   exit(EXIT_FAILURE);
+  }
 
-   if(! XSupportsLocale()) {
-    printf("Current locale is not supported\n");
-    exit(EXIT_FAILURE);
-   }
+  if(! XSupportsLocale()) {
+   printf("Current locale is not supported\n");
+   exit(EXIT_FAILURE);
+  }
 
-   if((disp = XOpenDisplay(NULL)) == NULL)
-   {
-    fprintf(stderr, "X server に接続できません\n");
-    exit(EXIT_FAILURE);
-   }
+  if((disp = XOpenDisplay(NULL)) == NULL) {
+   fprintf(stderr, "X server に接続できません\n");
+   exit(EXIT_FAILURE);
+  }
 
-   root = XCreateSimpleWindow(disp, RootWindow(disp, 0), WIDTH, HEIGHT,
-   WIDTH, HEIGHT, 1, BlackPixel(disp, 0), WhitePixel(disp, 0));
+  root = XCreateSimpleWindow(disp, RootWindow(disp, 0), WIDTH, HEIGHT,
+         WIDTH, HEIGHT, 1, BlackPixel(disp, 0), WhitePixel(disp, 0));
 
-   win_name.value = (unsigned char*)"XMEMWORD";
-   win_name.encoding = XA_STRING;
-   win_name.format = 8;
-   win_name.nitems = strlen((char*)win_name.value);
-   XSetWMName(disp, root, &win_name);
+  win_name.value = (unsigned char*)"XMEMWORD";
+  win_name.encoding = XA_STRING;
+  win_name.format = 8;
+  win_name.nitems = strlen((char*)win_name.value);
+  XSetWMName(disp, root, &win_name);
 
-   /* GC の作成 */
-   gc1  = XCreateGC(disp, root, 0, 0);
-   gc2 = XCreateGC(disp, root, 0, 0);
-   gc3 = XCreateGC(disp, root, 0, 0);
-   XSetBackground(disp, gc2, BlackPixel(disp, 0));
-   XSetForeground(disp, gc2, WhitePixel(disp, 0));
-   font1 = XLoadFont(disp, "-*-fixed-medium-r-normal--14-*-*-*");
-   XSetFont(disp, gc1, font1);
-   XSetFont(disp, gc2, font1);
-   font2 = XLoadFont(disp, "9x15bold");
-   XSetFont(disp, gc3, font2);
-   cmap = DefaultColormap(disp, 0);
-   XAllocNamedColor(disp, cmap, "blue", &blue, &exect);
-   XSetForeground(disp, gc3, blue.pixel);
+  /* GC の作成 */
+  gc1  = XCreateGC(disp, root, 0, 0);
+  gc2 = XCreateGC(disp, root, 0, 0);
+  gc3 = XCreateGC(disp, root, 0, 0);
+  XSetBackground(disp, gc2, BlackPixel(disp, 0));
+  XSetForeground(disp, gc2, WhitePixel(disp, 0));
+  font1 = XLoadFont(disp, "-*-fixed-medium-r-normal--14-*-*-*");
+  XSetFont(disp, gc1, font1);
+  XSetFont(disp, gc2, font1);
+  font2 = XLoadFont(disp, "9x15bold");
+  XSetFont(disp, gc3, font2);
+  cmap = DefaultColormap(disp, 0);
+  XAllocNamedColor(disp, cmap, "blue", &blue, &exect);
+  XSetForeground(disp, gc3, blue.pixel);
 
-   /* 日本語フォントセットを生成する */
-   ja_fs = XCreateFontSet(disp, "-*-fixed-medium-r-normal--14-*-*-*",
-           &missing_list, &missing_count, &def_string);
+  /* 日本語フォントセットを生成する */
+  ja_fs = XCreateFontSet(disp, "-*-fixed-medium-r-normal--14-*-*-*",
+          &missing_list, &missing_count, &def_string);
 
-   if(ja_fs == NULL) {
-    printf("Failed to create fontset\n");
-    exit(EXIT_FAILURE);
-   }
+  if(ja_fs == NULL) {
+   printf("Failed to create fontset\n");
+   exit(EXIT_FAILURE);
+  }
 
-   XFreeStringList(missing_list);
+  XFreeStringList(missing_list);
 
-   /* サブウィンドウの作成 */
-   lab = XCreateSimpleWindow(disp, root, 10, 5,
-         (WIDTH - 20), (HEIGHT - 15), 1, BlackPixel(disp, 0), WhitePixel(disp,0));
+  /* サブウィンドウの作成 */
+  lab = XCreateSimpleWindow(disp, root, 10, 5,
+        (WIDTH - 20), (HEIGHT - 15), 1, BlackPixel(disp, 0), WhitePixel(disp,0));
 
-   moniter_frame = XCreateSimpleWindow(disp, root, 32, 25,
-                   (WIDTH - 45), (HEIGHT - 150), 0, BlackPixel(disp, 0), WhitePixel(disp, 0));
+  moniter_frame = XCreateSimpleWindow(disp, root, 32, 25,
+                  (WIDTH - 45), (HEIGHT - 150), 0, BlackPixel(disp, 0), WhitePixel(disp, 0));
 
-   question_moniter = XCreateSimpleWindow(disp, root, 37, 40,
-                      WIDTH - 72, HEIGHT - 182, 1, WhitePixel(disp, 0), BlackPixel(disp, 0));
+  question_moniter = XCreateSimpleWindow(disp, root, 37, 40,
+                     WIDTH - 72, HEIGHT - 182, 1, WhitePixel(disp, 0), BlackPixel(disp, 0));
 
-   user_input_moniter = XCreateSimpleWindow(disp, root, 32, ((HEIGHT - 180) + 50),
-                     WIDTH - 60, 100, 0, WhitePixel(disp, 0), BlackPixel(disp, 0));
+  user_input_moniter = XCreateSimpleWindow(disp, root, 32, ((HEIGHT - 180) + 50),
+                       WIDTH - 60, 100, 0, WhitePixel(disp, 0), BlackPixel(disp, 0));
 
-    /* インプットメソッド作成 */
-   if((im = XOpenIM(disp, NULL, NULL, NULL)) == NULL) {
-    printf("Couldn't open input method.\n");
-    exit(EXIT_FAILURE);
-   }
+  /* インプットメソッド作成 */
+  if((im = XOpenIM(disp, NULL, NULL, NULL)) == NULL) {
+   printf("Couldn't open input method.\n");
+   exit(EXIT_FAILURE);
+  }
 
-   /* インプットコンテキスト作成 */
-   ic = XCreateIC(im,
-        XNInputStyle,
-        XIMPreeditNothing | XIMStatusNothing,
-        XNClientWindow,
-        user_input_moniter,
-        NULL);
+  /* インプットコンテキスト作成 */
+  ic = XCreateIC(im,
+       XNInputStyle,
+       XIMPreeditNothing | XIMStatusNothing,
+       XNClientWindow,
+       user_input_moniter,
+       NULL);
 
-   if(ic == NULL) {
-    printf("Could't create input context.\n");
-    XCloseIM(im);
-    exit(EXIT_FAILURE);
-   }
+  if(ic == NULL) {
+   printf("Could't create input context.\n");
+   XCloseIM(im);
+   exit(EXIT_FAILURE);
+  }
 
 
-   /* 受け取るイベントをサーバに通知 */
-   XSelectInput(disp, root, ExposureMask | KeyPressMask);
+  /* 受け取るイベントをサーバに通知 */
+  XSelectInput(disp, root, ExposureMask | KeyPressMask);
 
-   XMapWindow(disp, root);
-   XMapSubwindows(disp, root);
-   XFlush(disp);
+  XMapWindow(disp, root);
+  XMapSubwindows(disp, root);
+  XFlush(disp);
 
-   while(1) {
-    printf("while-0\n");
-    XNextEvent(disp, &event);
+  while (1) {
+   printf("while-0\n");
+   XNextEvent(disp, &event);
 
-    if(event.type == Expose){
-     printf("Expose-0\n");
+   if (event.type == Expose) {
+    printf("Expose-0\n");
+    memset(user_input_strings, '\0', sizeof(user_input_strings));
 
-     memset(user_input_strings, '\0', sizeof(user_input_strings));
+    /* Draw the lab place */
+    XDrawString(disp, lab, gc3, 6,  15, lab_str1, strlen(lab_str1));
+    XDrawString(disp, lab, gc1, 85, 15, lab_str2, strlen(lab_str2));
+    XDrawString(disp, lab, gc1, 10, HEIGHT - 20, exit_str, strlen(exit_str));
 
-     /* Draw the lab place */
-     XDrawString(disp, lab, gc3, 6,  15, lab_str1, strlen(lab_str1));
-     XDrawString(disp, lab, gc1, 85, 15, lab_str2, strlen(lab_str2));
-     XDrawString(disp, lab, gc1, 10, HEIGHT - 20, exit_str, strlen(exit_str));
-
-     /* Draw the moniter_frame place */
-     XDrawString(disp, moniter_frame, gc1, 21, 13, moniter_frame_str, strlen(moniter_frame_str));
-     XDrawLine(disp, moniter_frame, gc1, 0, 8, 0, 190);
-     XDrawLine(disp, moniter_frame, gc1, 459, 8, 459, 190);
-     XDrawLine(disp, moniter_frame, gc1, 0, 8, 21, 8);
-     XDrawLine(disp, moniter_frame, gc1, 83, 8, 459, 8);
-     XDrawLine(disp, moniter_frame, gc1, 0, 190, 459, 190);
+    /* Draw the moniter_frame place */
+    XDrawString(disp, moniter_frame, gc1, 21, 13, moniter_frame_str, strlen(moniter_frame_str));
+    XDrawLine(disp, moniter_frame, gc1, 0, 8, 0, 190);
+    XDrawLine(disp, moniter_frame, gc1, 459, 8, 459, 190);
+    XDrawLine(disp, moniter_frame, gc1, 0, 8, 21, 8);
+    XDrawLine(disp, moniter_frame, gc1, 83, 8, 459, 8);
+    XDrawLine(disp, moniter_frame, gc1, 0, 190, 459, 190);
                     
-     /* Draw the moniter place */
-     XDrawString(disp, question_moniter, gc2, 3, 13, start_menu_str1, strlen(start_menu_str1));
+    /* Draw the moniter place */
+    XDrawString(disp, question_moniter, gc2, 3, 13, start_menu_str1, strlen(start_menu_str1));
 
-     /* Draw the user_input place */
-     XDrawString(disp, user_input_moniter, gc2, 25, 13, user_input_str, strlen(user_input_str));
-     XDrawString(disp, user_input_moniter, gc2, 8, 28, ":", 1);
-     XDrawLine(disp, user_input_moniter, gc2, 4, 8, 4, 93); 
-     XDrawLine(disp, user_input_moniter, gc2, 455, 8, 455, 93);
-     XDrawLine(disp, user_input_moniter, gc2, 4, 8, 25, 8);
-     XDrawLine(disp, user_input_moniter, gc2, 106, 8, 455, 8);
-     XDrawLine(disp, user_input_moniter, gc2, 4, 93, 455, 93);
+    /* Draw the user_input place */
+    XDrawString(disp, user_input_moniter, gc2, 25, 13, user_input_str, strlen(user_input_str));
+    XDrawString(disp, user_input_moniter, gc2, 8, 28, ":", 1);
+    XDrawLine(disp, user_input_moniter, gc2, 4, 8, 4, 93); 
+    XDrawLine(disp, user_input_moniter, gc2, 455, 8, 455, 93);
+    XDrawLine(disp, user_input_moniter, gc2, 4, 8, 25, 8);
+    XDrawLine(disp, user_input_moniter, gc2, 106, 8, 455, 8);
+    XDrawLine(disp, user_input_moniter, gc2, 4, 93, 455, 93);
 
-     /* Draw the jp strings on the moniter place */
-     XmbDrawString(disp, question_moniter, ja_fs, gc2, 3, 30, 
-		   start_menu_str2, strlen(start_menu_str2));
-     XmbDrawString(disp, question_moniter, ja_fs, gc2, 3, 50,
-		   start_menu_select1, strlen(start_menu_select1));
-     XmbDrawString(disp, question_moniter, ja_fs, gc2, 3, 70,
-		   start_menu_select2, strlen(start_menu_select2));
-     XmbDrawString(disp, question_moniter, ja_fs, gc2, 3, 90,
-		   start_menu_select3, strlen(start_menu_select3));
+    /* Draw the jp strings on the moniter place */
+    XmbDrawString(disp, question_moniter, ja_fs, gc2, 3, 30, 
+                  start_menu_str2, strlen(start_menu_str2));
+    XmbDrawString(disp, question_moniter, ja_fs, gc2, 3, 50,
+                  start_menu_select1, strlen(start_menu_select1));
+    XmbDrawString(disp, question_moniter, ja_fs, gc2, 3, 70,
+                  start_menu_select2, strlen(start_menu_select2));
+    XmbDrawString(disp, question_moniter, ja_fs, gc2, 3, 90,
+                  start_menu_select3, strlen(start_menu_select3));
 
-     XFlush(disp);
+    XFlush(disp);
+   }
+
+   if (event.type == KeyPress) { // 最初のキーイベント 入力待受
+    printf("while-0_KeyPress\n");
+    XLookupString((XKeyEvent *)&event, NULL, sizeof(key_sym), &key_sym, NULL);
+
+    if(key_sym == XK_Escape){
+     ExitProgram();
     }
 
-    if (event.type == KeyPress) { // 最初のキーイベント 入力待受
-     printf("while-0_KeyPress\n");
-     XLookupString((XKeyEvent *)&event, NULL, sizeof(key_sym), &key_sym, NULL);
+    t_cnt = XmbLookupString(ic, (XKeyPressedEvent*)&event,        // キーシムと文字列の両方を返している
+    buffer, sizeof(buffer), &key_sym, &status);
 
-     if(key_sym == XK_Escape){
-      ExitProgram();
-     }
-
-     t_cnt = XmbLookupString(ic, (XKeyPressedEvent*)&event,        // キーシムと文字列の両方を返している
-             buffer, sizeof(buffer), &key_sym, &status);
-
-     if(key_sym == XK_Delete || key_sym == XK_BackSpace) {
-      DeleteCharacter();
-      printf("w1_D_%s\n", user_input_strings);
-     } else if ((status == XLookupChars || status == XLookupBoth) && !(key_sym == XK_Return)) {
-      XmbDrawString(disp, user_input_moniter, ja_fs, gc2, (input_position + 16), 28, buffer, t_cnt);
-      input_position += 7;
-      user_input_strings[char_cnt] = key_sym;
-      char_cnt++;
-      printf("w1_S_%s\n", user_input_strings);
-     } else if (key_sym == XK_Return) {
-      printf("User Pressed Return key with %s\n", user_input_strings);
-      UserInputMoniterClear();
+    if(key_sym == XK_Delete || key_sym == XK_BackSpace) {
+     DeleteCharacter();
+     printf("w1_D_%s\n", user_input_strings);
+    } else if ((status == XLookupChars || status == XLookupBoth) && !(key_sym == XK_Return)) {
+     XmbDrawString(disp, user_input_moniter, ja_fs, gc2, (input_position + 16), 28, buffer, t_cnt);
+     input_position += 7;
+     user_input_strings[char_cnt] = key_sym;
+     char_cnt++;
+     printf("w1_S_%s\n", user_input_strings);
+    } else if (key_sym == XK_Return) {
+     printf("User Pressed Return key with %s\n", user_input_strings);
+     UserInputMoniterClear();
 
 //エラーチェック書くこと
-      if((user_input_strings[0] == '0') && (user_input_strings[1] == '\0')) {    // 0 プログラム終了押下
-       ExitProgram();
-      } else if((user_input_strings[0] == '1') && (user_input_strings[1] == '\0')) { // 1 暗記を始める押下
+     if((user_input_strings[0] == '0') && (user_input_strings[1] == '\0')) {    // 0 プログラム終了押下
+      ExitProgram();
+     } else if((user_input_strings[0] == '1') && (user_input_strings[1] == '\0')) { // 1 暗記を始める押下
 
 /*出題ファイル選択画面 start*/
 
-      /* 画面クリア */ 
+    /* 画面クリア */ 
       memset(user_input_strings, '\0', sizeof(user_input_strings)); // ユーザ入力文字格納変数初期化
       ClearQuestionMoniter();
 
-      // 出題ファイル画面文字列出力処理 //
+    // 出題ファイル画面文字列出力処理 //
       XDrawString(disp, question_moniter, gc2, 3, 13, file_select_menu_str1,
                   strlen(file_select_menu_str1));
       XmbDrawString(disp, question_moniter, ja_fs, gc2, 3, 30, file_select_menu_str2,
-                  strlen(file_select_menu_str2));
+                    strlen(file_select_menu_str2));
       XmbDrawString(disp, question_moniter, ja_fs, gc2, 3, 50, back_to_mainmenu_str,
-                  strlen(back_to_mainmenu_str));
+                    strlen(back_to_mainmenu_str));
 
-      // 出題ファイル名出力処理 //
+    // 出題ファイル名出力処理 //
       for (cnt = 0; cnt < number_of_files; cnt++) {
        sprintf(question_number_str, "[%3d]", (cnt + 1));
        XmbDrawString(disp, question_moniter, ja_fs, gc2, 3,
-		    (70 + (cnt * 20)), question_number_str, 5);
+                    (70 + (cnt * 20)), question_number_str, 5);
        XmbDrawString(disp, question_moniter, ja_fs, gc2, 45,
-		    (70 + (cnt * 20)), filelist_s[cnt].file_name,
-		    strlen(filelist_s[cnt].file_name));
+                    (70 + (cnt * 20)), filelist_s[cnt].file_name,
+                    strlen(filelist_s[cnt].file_name));
       }
 
       while(1) {
@@ -526,7 +526,7 @@ int main(int argc, char **argv)
          printf("User Pressed Return.\n");
          char_cnt = 0;
 
-         /* 入力エラーチェック */
+     /* 入力エラーチェック */
          if (((user_input_strings[0] - 48) > number_of_files ) && (user_input_strings[1] == '\0')) {
           XmbDrawString(disp, user_input_moniter, ja_fs, gc2, (input_position + 9), 48, error_check_strings1, strlen(error_check_strings1));
           XmbDrawString(disp, user_input_moniter, ja_fs, gc2, (input_position + 9), 68, error_check_strings2, strlen(error_check_strings2));
@@ -549,7 +549,7 @@ int main(int argc, char **argv)
           break;
          } else if ((user_input_strings[0] >= 1) && (user_input_strings[1] == '\0')) { // 1以上の数押下   
 
-          /*出題ファイルポインタ取得*/
+      /*出題ファイルポインタ取得*/
           if ((reading_fp = fopen(filelist_s[(user_input_strings[0] -48) - 1].file_name, "r")) == NULL) {
            printf("ファイルの読み込みに失敗しました。\n");
            printf("file open error.\n");
@@ -567,7 +567,6 @@ int main(int argc, char **argv)
           memset(user_input_strings, '\0', sizeof(user_input_strings));
           break;
          } else { //不必要な分岐かも
-
           XmbDrawString(disp, user_input_moniter, ja_fs, gc2, (input_position + 16), 28, buffer, t_cnt);
           input_position += 7;
           user_input_strings[char_cnt] = key_sym;
@@ -581,63 +580,65 @@ int main(int argc, char **argv)
           memset(user_input_strings, '\0', sizeof(user_input_strings));
           break;
          }
+
         }
+
        }
 /*出題ファイル選択画面 end*/
 
       }
 //出題順序選択画面 start
-       memset(user_input_strings, '\0', sizeof(user_input_strings)); // ユーザ入力文字格納変数初期化
-       ClearQuestionMoniter();
+      memset(user_input_strings, '\0', sizeof(user_input_strings)); // ユーザ入力文字格納変数初期化
+      ClearQuestionMoniter();
 
 //出題順序選択文字列文字列出力
-       XDrawString(disp, question_moniter, gc2, 3, 13, order_select_str1,
-                   strlen(order_select_str1));
-       XmbDrawString(disp, question_moniter, ja_fs, gc2, 3, 30, order_select_str2,
-                     strlen(order_select_str2));
-       XmbDrawString(disp, question_moniter, ja_fs, gc2, 3, 50, back_to_mainmenu_str,
-                     strlen(back_to_mainmenu_str));
-       XmbDrawString(disp, question_moniter, ja_fs, gc2, 3, 70, order_select_str3,
-                     strlen(order_select_str3));
-       XmbDrawString(disp, question_moniter, ja_fs, gc2, 3, 90, order_select_str4,
-                     strlen(order_select_str4));
-       XmbDrawString(disp, question_moniter, ja_fs, gc2, 3, 110, order_select_str5,
-                     strlen(order_select_str5));
-       XmbDrawString(disp, question_moniter, ja_fs, gc2, 3, 130, order_select_str6,
-                     strlen(order_select_str6));
+      XDrawString(disp, question_moniter, gc2, 3, 13, order_select_str1,
+                  strlen(order_select_str1));
+      XmbDrawString(disp, question_moniter, ja_fs, gc2, 3, 30, order_select_str2,
+                    strlen(order_select_str2));
+      XmbDrawString(disp, question_moniter, ja_fs, gc2, 3, 50, back_to_mainmenu_str,
+                    strlen(back_to_mainmenu_str));
+      XmbDrawString(disp, question_moniter, ja_fs, gc2, 3, 70, order_select_str3,
+                    strlen(order_select_str3));
+      XmbDrawString(disp, question_moniter, ja_fs, gc2, 3, 90, order_select_str4,
+                    strlen(order_select_str4));
+      XmbDrawString(disp, question_moniter, ja_fs, gc2, 3, 110, order_select_str5,
+                    strlen(order_select_str5));
+      XmbDrawString(disp, question_moniter, ja_fs, gc2, 3, 130, order_select_str6,
+                    strlen(order_select_str6));
 
-       while(1) {
-        XNextEvent(disp, &event);
+      while(1) {
+       XNextEvent(disp, &event);
                             
-        if (event.type ==  KeyPress) { // 出題ファイル選択画面　入力待受
-         printf("while-1_KeyPress\n");
-         t_cnt = XmbLookupString(ic, (XKeyPressedEvent*)&event, // キーシムと文字列の両方を返している
-                 buffer, sizeof(buffer), &key_sym, &status);
+       if (event.type ==  KeyPress) { // 出題ファイル選択画面　入力待受
+        printf("while-1_KeyPress\n");
+        t_cnt = XmbLookupString(ic, (XKeyPressedEvent*)&event, // キーシムと文字列の両方を返している
+                buffer, sizeof(buffer), &key_sym, &status);
 
-         if(key_sym == XK_Escape){
-            ExitProgram();
-         }
-
-         XLookupString((XKeyEvent *)&event, NULL, sizeof(key_sym), &key_sym, NULL);
-
-         if (key_sym == XK_Delete || key_sym == XK_BackSpace) {
-          printf("1_esc_%lu\n", key_sym);
-          DeleteCharacter();
-         } else if ((status == XLookupChars || status == XLookupBoth) && !(key_sym == XK_Return)) {
-          XClearArea(disp, user_input_moniter, 8, 35, 440, 16, False); // この行とこの下の行は一回の呼び出しにまとめる
-          XClearArea(disp, user_input_moniter, 8, 55, 440, 16, False);
-          printf("4-%d\n", event.type);
-          XmbDrawString(disp, user_input_moniter, ja_fs, gc2, (input_position + 16), 28, buffer, t_cnt);
-          input_position += 7;
-          user_input_strings[char_cnt] = key_sym;
-          char_cnt++;
-         } else if (key_sym == XK_Return) {
-          UserInputMoniterClear();
-          printf("User Pressed Return.\n");
-          char_cnt = 0;
+        if(key_sym == XK_Escape){
+         ExitProgram();
         }
 
-        /* 入力エラーチェック */
+        XLookupString((XKeyEvent *)&event, NULL, sizeof(key_sym), &key_sym, NULL);
+
+        if (key_sym == XK_Delete || key_sym == XK_BackSpace) {
+         printf("1_esc_%lu\n", key_sym);
+         DeleteCharacter();
+        } else if ((status == XLookupChars || status == XLookupBoth) && !(key_sym == XK_Return)) {
+         XClearArea(disp, user_input_moniter, 8, 35, 440, 16, False); // この行とこの下の行は一回の呼び出しにまとめる
+         XClearArea(disp, user_input_moniter, 8, 55, 440, 16, False);
+         printf("4-%d\n", event.type);
+         XmbDrawString(disp, user_input_moniter, ja_fs, gc2, (input_position + 16), 28, buffer, t_cnt);
+         input_position += 7;
+         user_input_strings[char_cnt] = key_sym;
+         char_cnt++;
+        } else if (key_sym == XK_Return) {
+         UserInputMoniterClear();
+         printf("User Pressed Return.\n");
+         char_cnt = 0;
+        }
+
+    /* 入力エラーチェック */
         if (((user_input_strings[0] - 48) > 6 ) && (user_input_strings[1] == '\0')) {
          XmbDrawString(disp, user_input_moniter, ja_fs, gc2, (input_position + 9), 48, error_check_strings1, strlen(error_check_strings1));
          XmbDrawString(disp, user_input_moniter, ja_fs, gc2, (input_position + 9), 68, error_check_strings2, strlen(error_check_strings2));
@@ -658,10 +659,12 @@ int main(int argc, char **argv)
          memset(user_input_strings, '\0', sizeof(user_input_strings));
         } else if (((user_input_strings[0] - 48) == 1) && (user_input_strings[1] == '\0')) { // 0 メインメニューに戻る押下
          question_max = fp_read_and_split(reading_fp, answer_and_question_s);
-	 break;
-	}
+         break;
+        }
+
        }
-      }
+
+      }  
 // end
    //   memset(user_input_strings, '\0', sizeof(user_input_strings));
 
@@ -678,5 +681,5 @@ int main(int argc, char **argv)
 //    exit(EXIT_SUCCESS);
  }
 
-}
 
+}
