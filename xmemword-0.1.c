@@ -267,6 +267,13 @@ int main(int argc, char **argv) {
  char *order_select_str6 = "[  4} 解答の文字数が少ない順に出題する。";
  char question_number_str[256];
 
+/*出題数決定画面用*/
+ char question_max_str[256];
+ char *decision_question_num_str1 = "出題数 / ";
+ char *decision_question_num_str2 = "全問出題しますか?";
+ char *decision_question_num_str3 = "(y/n)";
+
+
 /*    method        */
  strcat(command_line_str, EDITOR);
 
@@ -415,11 +422,9 @@ int main(int argc, char **argv) {
   XFlush(disp);
 
   while (1) {
-   printf("while-0\n");
    XNextEvent(disp, &event);
 
    if (event.type == Expose) {
-    printf("Expose-0\n");
     memset(user_input_strings, '\0', sizeof(user_input_strings));
 
     /* Draw the lab place */
@@ -464,7 +469,6 @@ int main(int argc, char **argv) {
    }
 
    if (event.type == KeyPress) { // 最初のキーイベント 入力待受
-    printf("while-0_KeyPress\n");
     XLookupString((XKeyEvent *)&event, NULL, sizeof(key_sym), &key_sym, NULL);
 
     if(key_sym == XK_Escape){
@@ -484,9 +488,7 @@ int main(int argc, char **argv) {
      input_position += 7;
      user_input_strings[char_cnt] = key_sym;
      char_cnt++;
-     printf("w1_S_%s\n", user_input_strings);
     } else if (key_sym == XK_Return) {
-     printf("User Pressed Return key with %s\n", user_input_strings);
      UserInputMoniterClear();
 
 //エラーチェック書くこと
@@ -574,7 +576,7 @@ int main(int argc, char **argv) {
           ClearQuestionMoniter();
           XClearArea(disp, user_input_moniter, 16, 15, 400, 15, False);
           XmbDrawString(disp, user_input_moniter, ja_fs, gc2,
-	 (input_position + 16), 28, buffer, t_cnt);
+                       (input_position + 16), 28, buffer, t_cnt);
           XDrawString(disp, question_moniter, gc2, 3, 13, start_menu_str1, strlen(start_menu_str1));
           DrawQuestionMoniterJp(Q_SCREEN_1);
           UserInputMoniterClear();
@@ -664,7 +666,6 @@ int main(int argc, char **argv) {
                        &key_sym, NULL);
 
         if (key_sym == XK_Delete || key_sym == XK_BackSpace) {
-         printf("1_esc_%lu\n", key_sym);
          DeleteCharacter();
         } else if ((status == XLookupChars || status == XLookupBoth) &&
                   !(key_sym == XK_Return)) {
@@ -678,46 +679,65 @@ int main(int argc, char **argv) {
          char_cnt++;
         } else if (key_sym == XK_Return) {
          UserInputMoniterClear();
-         printf("User Pressed Return.\n");
          char_cnt = 0;
-        }
+        
 
-    /* 入力エラーチェック */
-        if (((user_input_strings[0] - 48) > 6 ) &&
-             (user_input_strings[1] == '\0')) {
-         XmbDrawString(disp, user_input_moniter, ja_fs, gc2,
-                      (input_position + 9), 48, error_check_strings1,
-                       strlen(error_check_strings1));
-         XmbDrawString(disp, user_input_moniter, ja_fs, gc2,
-                      (input_position + 9), 68, error_check_strings2,
-                       strlen(error_check_strings2));
-         input_position = 0;
-         user_input_strings[char_cnt] = key_sym;
-         char_cnt++;
-        } else if ((user_input_strings[0] == '0') &&
-                   (user_input_strings[1] == '\0')) { // 0 メインメニューに戻る押下
-         XmbDrawString(disp, user_input_moniter, ja_fs, gc2,
-                      (input_position + 16), 28, buffer, t_cnt);
-         input_position += 7;
-         user_input_strings[char_cnt] = key_sym;
-         char_cnt++;
-         ClearQuestionMoniter();
-         XClearArea(disp, user_input_moniter, 16, 15, 400, 15, False);
-         XmbDrawString(disp, user_input_moniter, ja_fs, gc2,
-                      (input_position + 16), 28, buffer, t_cnt);
-         XDrawString(disp, question_moniter, gc2, 3, 13, start_menu_str1,
-                     strlen(start_menu_str1));
-         DrawQuestionMoniterJp(Q_SCREEN_1);
-         UserInputMoniterClear();
-         memset(user_input_strings, '\0', sizeof(user_input_strings));
-        } else if (((user_input_strings[0] - 48) == 1) &&
-                    (user_input_strings[1] == '\0')) { // 0 メインメニューに戻る押下
-         question_max = fp_read_and_split(reading_fp, answer_and_question_s);
-         break;
-        }
+/* 入力エラーチェック */
+         if (((user_input_strings[0] - 48) > 6 ) && // 入力された数値が6より大きい
+              (user_input_strings[1] == '\0')) {
+          XmbDrawString(disp, user_input_moniter, ja_fs, gc2,
+                       (input_position + 9), 48, error_check_strings1,
+                        strlen(error_check_strings1));
+          XmbDrawString(disp, user_input_moniter, ja_fs, gc2,
+                       (input_position + 9), 68, error_check_strings2,
+                        strlen(error_check_strings2));
+          input_position = 0;
+          user_input_strings[char_cnt] = key_sym;
+          char_cnt++;
+         } else if ((user_input_strings[0] == '0') && // 0 メインメニューに戻る押下
+                    (user_input_strings[1] == '\0')) { 
+          XmbDrawString(disp, user_input_moniter, ja_fs, gc2,
+                       (input_position + 16), 28, buffer, t_cnt);
+          input_position += 7;
+          user_input_strings[char_cnt] = key_sym;
+          char_cnt++;
+          ClearQuestionMoniter();
+          XClearArea(disp, user_input_moniter, 16, 15, 400, 15, False);
+          XmbDrawString(disp, user_input_moniter, ja_fs, gc2,
+                       (input_position + 16), 28, buffer, t_cnt);
+          XDrawString(disp, question_moniter, gc2, 3, 13, start_menu_str1,
+                      strlen(start_menu_str1));
+          DrawQuestionMoniterJp(Q_SCREEN_1);
+          UserInputMoniterClear();
+          memset(user_input_strings, '\0', sizeof(user_input_strings));
+         } else if (((user_input_strings[0] - 48) == 1) && // 1だった場合の処理
+                     (user_input_strings[1] == '\0')) { 
+           memset(user_input_strings, '\0', sizeof(user_input_strings)); // ユーザ入力文字格納変数初期化
+           ClearQuestionMoniter();
+// 出題数
+// 全問出題しますか?
+          question_max = fp_read_and_split(reading_fp, answer_and_question_s);
+          snprintf(question_max_str, strlen(question_max_str), "%d", question_max);
 
+          XDrawString(disp, question_moniter, gc2, 3, 13, "(aaa)",
+                      strlen("(aaa)"));
+          XmbDrawString(disp, question_moniter, ja_fs, gc2, 3, 30,
+		                      decision_question_num_str1,
+                        strlen(decision_question_num_str1));
+          XmbDrawString(disp, question_moniter, ja_fs, gc2, 15, 30,
+		                      question_max_str,
+                        strlen(question_max_str));
+          XmbDrawString(disp, question_moniter, ja_fs, gc2, 3, 50,
+		                      decision_question_num_str2,
+                        strlen(decision_question_num_str2));
+          XmbDrawString(disp, question_moniter, ja_fs, gc2, 3, 70,
+		                      decision_question_num_str3,
+                        strlen(decision_question_num_str3));
+
+          break;
+         }
+        }
        }
-
       }  
 // end
    //   memset(user_input_strings, '\0', sizeof(user_input_strings));
@@ -734,6 +754,4 @@ int main(int argc, char **argv) {
   ExitProgram();
 //    exit(EXIT_SUCCESS);
  }
-
-
 }
