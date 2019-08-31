@@ -269,10 +269,9 @@ int main(int argc, char **argv) {
 
 /*出題数決定画面用*/
  char question_max_str[256];
- char *decision_question_num_str1 = "出題数 / ";
- char *decision_question_num_str2 = "全問出題しますか?";
+ char decision_question_num_str1[256] = "出題数 / ";
+ char decision_question_num_str2[256] = "全問出題しますか?";
  char *decision_question_num_str3 = "(y/n)";
-
 
 /*    method        */
  strcat(command_line_str, EDITOR);
@@ -717,22 +716,25 @@ int main(int argc, char **argv) {
 // 出題数
 // 全問出題しますか?
           question_max = fp_read_and_split(reading_fp, answer_and_question_s);
-          snprintf(question_max_str, strlen(question_max_str), "%d", question_max);
+          printf("%d\n", question_max);
+          memset(question_max_str, '\0', sizeof(question_max_str));
+          sprintf(question_max_str, "%d", question_max);
+          printf("%s\n", question_max_str);
+          strcat(decision_question_num_str1, question_max_str);
 
           XDrawString(disp, question_moniter, gc2, 3, 13, "(aaa)",
                       strlen("(aaa)"));
           XmbDrawString(disp, question_moniter, ja_fs, gc2, 3, 30,
 		                      decision_question_num_str1,
                         strlen(decision_question_num_str1));
-          XmbDrawString(disp, question_moniter, ja_fs, gc2, 15, 30,
-		                      question_max_str,
-                        strlen(question_max_str));
           XmbDrawString(disp, question_moniter, ja_fs, gc2, 3, 50,
 		                      decision_question_num_str2,
                         strlen(decision_question_num_str2));
           XmbDrawString(disp, question_moniter, ja_fs, gc2, 3, 70,
 		                      decision_question_num_str3,
                         strlen(decision_question_num_str3));
+
+          strcpy(decision_question_num_str1, "出題数 / ");
 
           break;
          }
