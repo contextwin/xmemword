@@ -846,8 +846,8 @@ printf("%s\n", qput_question_str);
                   DeleteCharacter();
                  } else if ((status == XLookupChars || status == XLookupBoth) &&
                   !(key_sym == XK_Return)) {
-                  XClearArea(disp, user_input_moniter, 8, 35, 440, 16, False); // この行とこの下の行は一回の呼び出しにまとめる
-                  XClearArea(disp, user_input_moniter, 8, 55, 440, 16, False);
+            //      XClearArea(disp, user_input_moniter, 8, 35, 440, 16, False); // この行とこの下の行は一回の呼び出しにまとめる
+//                  XClearArea(disp, user_input_moniter, 8, 55, 440, 16, False);
                   XmbDrawString(disp, user_input_moniter, ja_fs, gc2,
                                (input_position + 16), 28, buffer, t_cnt);
                   input_position += 7;
@@ -855,6 +855,21 @@ printf("%s\n", qput_question_str);
                   char_cnt++;
                  } else if (key_sym == XK_Return) {
                   UserInputMoniterClear();
+
+                  if (!strcmp(answer_and_question_s[cnt].answer, user_input_strings)){
+                   XDrawString(disp, user_input_moniter, gc2, (input_position + 9),
+                              48, "correct!!", 9);
+                   XDrawString(disp, user_input_moniter, gc2, (input_position + 9),
+                              68, "A: ", 3);
+                  } else {
+                   XDrawString(disp, user_input_moniter, gc2, (input_position + 9),
+                              48, "miss!!", 6);
+                   XDrawString(disp, user_input_moniter, gc2, (input_position + 9),
+                              68, "A: ", 3);
+                   cnt1--, cnt--;
+                  }
+
+                  memset(user_input_strings, '\0', sizeof(user_input_strings));
                   char_cnt = 0;
                   break;
                  }
