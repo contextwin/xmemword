@@ -278,7 +278,8 @@ int main(int argc, char **argv) {
  char qput_question_number_str[256] = "question number : ";
  char qput_line_number_str[256] = "line number : ";
  char qput_question_str[1024] = "Q: ";
- char cnt1_str1[1024];
+ char cnt_str1[256];
+ char line_number_str[256];
 
 /*    method        */
  strcat(command_line_str, EDITOR);
@@ -809,11 +810,15 @@ printf("number_of_end_question is %d\n", number_of_end_question);
                               cnt1 = 1;
                               cnt < number_of_end_question;
                               cnt++, cnt1++) {
-                         sprintf(cnt1_str1, "%d", cnt1);
-                         strcat(qput_question_number_str, cnt1_str1);
+                         sprintf(cnt_str1, "%d\t", cnt1);
+                         sprintf(line_number_str, "%ld", answer_and_question_s[cnt].number);
+                         strcat(qput_question_number_str, cnt_str1);
+																									strcat(qput_line_number_str, line_number_str);
                           
-printf("%s\n", qput_question_number_str);
+printf("%s%s\n", qput_question_number_str, qput_line_number_str);
+
                          strcpy(qput_question_number_str, "question number : ");
+                         strcpy(qput_line_number_str, "line number : ");
                          }
 
              } else if ((user_input_strings[0] == 'n') &&
