@@ -103,14 +103,14 @@ unsigned int fp_read_and_split(FILE *fp,
 
 /* view function */
 void ClearQuestionMoniter() {
- XClearArea(disp, question_moniter, 3,  2, 440, 16, False);
- XClearArea(disp, question_moniter, 3, 17, 440, 16, False);
- XClearArea(disp, question_moniter, 3, 37, 440, 16, False);
- XClearArea(disp, question_moniter, 3, 57, 440, 16, False);
- XClearArea(disp, question_moniter, 3, 77, 440, 16, False);
- XClearArea(disp, question_moniter, 3, 97, 440, 16, False);
- XClearArea(disp, question_moniter, 3, 117, 440, 16, False);
- XClearArea(disp, question_moniter, 3, 137, 440, 16, False);
+ XClearArea(disp, question_moniter, 3,  2, 445, 16, False);
+ XClearArea(disp, question_moniter, 3, 17, 445, 16, False);
+ XClearArea(disp, question_moniter, 3, 37, 445, 16, False);
+ XClearArea(disp, question_moniter, 3, 57, 445, 16, False);
+ XClearArea(disp, question_moniter, 3, 77, 445, 16, False);
+ XClearArea(disp, question_moniter, 3, 97, 445, 16, False);
+ XClearArea(disp, question_moniter, 3, 117, 445, 16, False);
+ XClearArea(disp, question_moniter, 3, 137, 445, 16, False);
 };
 
 void DrawQuestionMoniterJp(unsigned char q_screen) {
