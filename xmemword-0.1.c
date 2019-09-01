@@ -646,9 +646,9 @@ int main(int argc, char **argv) {
       XDrawString(disp, question_moniter, gc2, 3, 13, order_select_str1,
                  strlen(order_select_str1));
       XmbDrawString(disp, question_moniter, ja_fs, gc2, 3, 30,
-		    order_select_str2, strlen(order_select_str2));
+             		    order_select_str2, strlen(order_select_str2));
       XmbDrawString(disp, question_moniter, ja_fs, gc2, 3, 50,
-		    back_to_mainmenu_str, strlen(back_to_mainmenu_str));
+		                 back_to_mainmenu_str, strlen(back_to_mainmenu_str));
       XmbDrawString(disp, question_moniter, ja_fs, gc2, 3, 70,
                    order_select_str3, strlen(order_select_str3));
       XmbDrawString(disp, question_moniter, ja_fs, gc2, 3, 90,
@@ -822,6 +822,9 @@ printf("number_of_end_question is %d\n", number_of_end_question);
                          ClearQuestionMoniter();
                          XDrawString(disp, question_moniter, gc2, 3, 13, qput_str1,
                                      strlen(qput_str1));
+                         XmbDrawString(disp, question_moniter, ja_fs, gc2, 3, 30,
+		                                    qput_question_str,
+                                      strlen(qput_question_str));
                           
 printf("%s%s\n", qput_question_number_str, qput_line_number_str);
 printf("%s\n", qput_str1);
@@ -848,7 +851,6 @@ ExitProgram();
         }
        }
       }  
-   //   memset(user_input_strings, '\0', sizeof(user_input_strings));
      }
     }
    }
