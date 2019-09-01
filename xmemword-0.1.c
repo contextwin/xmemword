@@ -815,7 +815,9 @@ printf("number_of_end_question is %d\n", number_of_end_question);
                          sprintf(line_number_str, "%ld", answer_and_question_s[cnt].number);
                          strcat(qput_question_number_str, cnt_str1);
 																									strcat(qput_line_number_str, line_number_str);
+                         strcat(qput_question_str, answer_and_question_s[cnt].question);
                          sprintf(qput_str1, "%s%s", qput_question_number_str, qput_line_number_str);
+																						
 
                          ClearQuestionMoniter();
                          XDrawString(disp, question_moniter, gc2, 3, 13, qput_str1,
@@ -823,9 +825,11 @@ printf("number_of_end_question is %d\n", number_of_end_question);
                           
 printf("%s%s\n", qput_question_number_str, qput_line_number_str);
 printf("%s\n", qput_str1);
+printf("%s\n", qput_question_str);
 
                          strcpy(qput_question_number_str, "question number : ");
                          strcpy(qput_line_number_str, "line number : ");
+                         strcpy(qput_question_str, "Q : ");
                          memset(qput_str1, '\0', sizeof(qput_str1));
                          }
 
