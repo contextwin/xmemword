@@ -280,6 +280,7 @@ int main(int argc, char **argv) {
  char qput_question_str[1024] = "Q: ";
  char cnt_str1[256];
  char line_number_str[256];
+ char qput_str1[1024];
 
 /*    method        */
  strcat(command_line_str, EDITOR);
@@ -799,7 +800,7 @@ printf("aaa-%s\n", user_input_strings);
                memset(user_input_strings, '\0',
                sizeof(user_input_strings)); // ユーザ入力文字格納変数初期化
                number_of_end_question = question_max;
-               ClearQuestionMoniter();
+        //       ClearQuestionMoniter();
 
 
 printf("number_of_start_question is %d\n", number_of_start_question);
@@ -810,15 +811,22 @@ printf("number_of_end_question is %d\n", number_of_end_question);
                               cnt1 = 1;
                               cnt < number_of_end_question;
                               cnt++, cnt1++) {
-                         sprintf(cnt_str1, "%d\t", cnt1);
+                         sprintf(cnt_str1, "%d    ", cnt1);
                          sprintf(line_number_str, "%ld", answer_and_question_s[cnt].number);
                          strcat(qput_question_number_str, cnt_str1);
 																									strcat(qput_line_number_str, line_number_str);
+                         sprintf(qput_str1, "%s%s", qput_question_number_str, qput_line_number_str);
+
+                         ClearQuestionMoniter();
+                         XDrawString(disp, question_moniter, gc2, 3, 13, qput_str1,
+                                     strlen(qput_str1));
                           
 printf("%s%s\n", qput_question_number_str, qput_line_number_str);
+printf("%s\n", qput_str1);
 
                          strcpy(qput_question_number_str, "question number : ");
                          strcpy(qput_line_number_str, "line number : ");
+                         memset(qput_str1, '\0', sizeof(qput_str1));
                          }
 
              } else if ((user_input_strings[0] == 'n') &&
