@@ -272,6 +272,7 @@ int main(int argc, char **argv) {
  char decision_question_num_str1[256] = "出題数 / ";
  char decision_question_num_str2[256] = "全問出題しますか?";
  char *decision_question_num_str3 = "(y/n)";
+ char *error_decision_question_num_str1 = "yかnで入力して下さい。";
 
 /*    method        */
  strcat(command_line_str, EDITOR);
@@ -680,7 +681,7 @@ int main(int argc, char **argv) {
          UserInputMoniterClear();
          char_cnt = 0;
         
-
+printf("bbb-%s\n", user_input_strings);
 /* 入力エラーチェック */
          if (((user_input_strings[0] - 48) > 6 ) && // 入力された数値が6より大きい
               (user_input_strings[1] == '\0')) {
@@ -711,7 +712,6 @@ int main(int argc, char **argv) {
           memset(user_input_strings, '\0', sizeof(user_input_strings));
          } else if (((user_input_strings[0] - 48) == 1) && // 1だった場合の処理
                      (user_input_strings[1] == '\0')) { 
-           memset(user_input_strings, '\0', sizeof(user_input_strings)); // ユーザ入力文字格納変数初期化
            ClearQuestionMoniter();
 // 出題数
 // 全問出題しますか?
@@ -736,24 +736,82 @@ int main(int argc, char **argv) {
 
           strcpy(decision_question_num_str1, "出題数 / ");
 
-          break;
+printf("ccc-%s\n", user_input_strings);
+          memset(user_input_strings, '\0', sizeof(user_input_strings)); // ユーザ入力文字格納変数初期化
+
+          while(1) {
+           XNextEvent(disp, &event);
+                            
+           if (event.type ==  KeyPress) { // 出題ファイル選択画面　入力待受
+            printf("while-1_KeyPress\n");
+            t_cnt = XmbLookupString(ic, (XKeyPressedEvent*)&event, // キーシムと文字列の両方を返している
+                buffer, sizeof(buffer), &key_sym, &status);
+
+            if(key_sym == XK_Escape){
+             ExitProgram();
+            }
+
+            XLookupString((XKeyEvent *)&event, NULL, sizeof(key_sym),
+                           &key_sym, NULL);
+
+           if (key_sym == XK_Delete || key_sym == XK_BackSpace) {
+               DeleteCharacter();
+           } else if ((status == XLookupChars || status == XLookupBoth) &&
+                     !(key_sym == XK_Return)) {
+             XClearArea(disp, user_input_moniter, 8, 35, 440, 16, False); // この行とこの下の行は一回の呼び出しにまとめる
+             XClearArea(disp, user_input_moniter, 8, 55, 440, 16, False);
+             printf("4-%d\n", event.type);
+             XmbDrawString(disp, user_input_moniter, ja_fs, gc2,
+                          (input_position + 16), 28, buffer, t_cnt);
+             input_position += 7;
+             user_input_strings[char_cnt] = key_sym;
+             char_cnt++;
+          // } else if (key_sym == XK_Return) {
+           //  UserInputMoniterClear();
+            // break;
+           } else if (key_sym == XK_Return) {
+printf("aaa-%s\n", user_input_strings);
+             UserInputMoniterClear();
+             char_cnt = 0;
+/* 入力エラーチェック */
+             if ((user_input_strings[0] != 'y') && // 入力された文字がyかn以外
+																	(user_input_strings[0] != 'n')) {
+                //  (user_input_strings[1] == '\0')) 
+                  
+              XmbDrawString(disp, user_input_moniter, ja_fs, gc2,
+                           (input_position + 9), 48, error_decision_question_num_str1,
+                            strlen(error_decision_question_num_str1));
+              XmbDrawString(disp, user_input_moniter, ja_fs, gc2,
+                           (input_position + 9), 68, error_check_strings2,
+                            strlen(error_check_strings2));
+              input_position = 0;
+              user_input_strings[char_cnt] = key_sym;
+              char_cnt++;
+             } else if ((user_input_strings[0] == 'y') &&
+                        (user_input_strings[1] == '\0')) {
+printf("aaaa\n");
+ExitProgram();
+             } else if ((user_input_strings[0] == 'n') &&
+                        (user_input_strings[1] == '\0')) {
+printf("bbbb\n");
+ExitProgram();
+             }
+            }
+           }
+          }
          }
         }
        }
       }  
 // end
    //   memset(user_input_strings, '\0', sizeof(user_input_strings));
-
      }
-
     }
-
    }
-
   }
-
   printf("MainExit\n");
   ExitProgram();
 //    exit(EXIT_SUCCESS);
  }
 }
+
