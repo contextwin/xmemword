@@ -728,8 +728,8 @@ printf("bbb-%s\n", user_input_strings);
           sprintf(question_max_str, "%d", question_max);
           strcat(select_all_put_question_str1, question_max_str);
 
-          XDrawString(disp, question_moniter, gc2, 3, 13, "(aaa)",
-                      strlen("(aaa)"));
+          XDrawString(disp, question_moniter, gc2, 3, 13, "(do you answer all question?)",
+                      strlen("(do you answer all question?)"));
           XmbDrawString(disp, question_moniter, ja_fs, gc2, 3, 30,
 		                      select_all_put_question_str1,
                         strlen(select_all_put_question_str1));
@@ -855,17 +855,24 @@ printf("%s\n", qput_question_str);
                   char_cnt++;
                  } else if (key_sym == XK_Return) {
                   UserInputMoniterClear();
+                  XClearArea(disp, user_input_moniter, 7, 30, 400, 58, False);
 
                   if (!strcmp(answer_and_question_s[cnt].answer, user_input_strings)){
                    XDrawString(disp, user_input_moniter, gc2, (input_position + 9),
                               48, "correct!!", 9);
                    XDrawString(disp, user_input_moniter, gc2, (input_position + 9),
-                              68, "A: ", 3);
+                              68, "A:", 2);
+                   XDrawString(disp, user_input_moniter, gc2, (input_position + 9 + 7 + 7),
+                              68, answer_and_question_s[cnt].answer, 
+                              strlen(answer_and_question_s[cnt].answer));
                   } else {
                    XDrawString(disp, user_input_moniter, gc2, (input_position + 9),
                               48, "miss!!", 6);
                    XDrawString(disp, user_input_moniter, gc2, (input_position + 9),
-                              68, "A: ", 3);
+                              68, "A: ", 2);
+                   XDrawString(disp, user_input_moniter, gc2, (input_position + 9 + 7 + 7),
+                              68, answer_and_question_s[cnt].answer,
+                              strlen(answer_and_question_s[cnt].answer));
                    cnt1--, cnt--;
                   }
 
