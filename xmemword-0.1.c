@@ -828,33 +828,37 @@ printf("%s\n", qput_question_str);
                 strcpy(qput_question_str, "Q : ");
                 memset(qput_str1, '\0', sizeof(qput_str1));
 
-                XNextEvent(disp, &event);
+                while(1) {
+																 XNextEvent(disp, &event);
                             
-                if (event.type ==  KeyPress) { // 出題ファイル選択画面　入力待受
-                 t_cnt = XmbLookupString(ic, (XKeyPressedEvent*)&event, // キーシムと文字列の両方を返している
-                 buffer, sizeof(buffer), &key_sym, &status);
+                 if (event.type ==  KeyPress) { // 出題ファイル選択画面　入力待受
+                  t_cnt = XmbLookupString(ic, (XKeyPressedEvent*)&event, // キーシムと文字列の両方を返している
+                  buffer, sizeof(buffer), &key_sym, &status);
 
-                if(key_sym == XK_Escape){
-                 ExitProgram();
-                }
+                 if(key_sym == XK_Escape){
+                  ExitProgram();
+                 }
 
-                XLookupString((XKeyEvent *)&event, NULL, sizeof(key_sym),
-                &key_sym, NULL);
+                 XLookupString((XKeyEvent *)&event, NULL, sizeof(key_sym),
+                 &key_sym, NULL);
 
-                if (key_sym == XK_Delete || key_sym == XK_BackSpace) {
-                 DeleteCharacter();
-                } else if ((status == XLookupChars || status == XLookupBoth) &&
-                 !(key_sym == XK_Return)) {
-                 XClearArea(disp, user_input_moniter, 8, 35, 440, 16, False); // この行とこの下の行は一回の呼び出しにまとめる
-                 XClearArea(disp, user_input_moniter, 8, 55, 440, 16, False);
-                 XmbDrawString(disp, user_input_moniter, ja_fs, gc2,
-                              (input_position + 16), 28, buffer, t_cnt);
-                 input_position += 7;
-                 user_input_strings[char_cnt] = key_sym;
-                 char_cnt++;
-                } else if (key_sym == XK_Return) {
-                 UserInputMoniterClear();
-                 char_cnt = 0;
+                 if (key_sym == XK_Delete || key_sym == XK_BackSpace) {
+                  DeleteCharacter();
+                 } else if ((status == XLookupChars || status == XLookupBoth) &&
+                  !(key_sym == XK_Return)) {
+                  XClearArea(disp, user_input_moniter, 8, 35, 440, 16, False); // この行とこの下の行は一回の呼び出しにまとめる
+                  XClearArea(disp, user_input_moniter, 8, 55, 440, 16, False);
+                  XmbDrawString(disp, user_input_moniter, ja_fs, gc2,
+                               (input_position + 16), 28, buffer, t_cnt);
+                  input_position += 7;
+                  user_input_strings[char_cnt] = key_sym;
+                  char_cnt++;
+                 } else if (key_sym == XK_Return) {
+                  UserInputMoniterClear();
+                  char_cnt = 0;
+                  break;
+                 }
+printf("%s\n", user_input_strings);
                 }
                }
               }
