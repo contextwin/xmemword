@@ -679,7 +679,6 @@ int main(int argc, char **argv) {
                   !(key_sym == XK_Return)) {
          XClearArea(disp, user_input_moniter, 8, 35, 440, 16, False); // この行とこの下の行は一回の呼び出しにまとめる
          XClearArea(disp, user_input_moniter, 8, 55, 440, 16, False);
-         printf("4-%d\n", event.type);
          XmbDrawString(disp, user_input_moniter, ja_fs, gc2,
                       (input_position + 16), 28, buffer, t_cnt);
          input_position += 7;
@@ -688,8 +687,6 @@ int main(int argc, char **argv) {
         } else if (key_sym == XK_Return) {
          UserInputMoniterClear();
          char_cnt = 0;
-        
-printf("bbb-%s\n", user_input_strings);
 /* 入力エラーチェック */
          if (((user_input_strings[0] - 48) > 6 ) && // 入力された数値が6より大きい
             (user_input_strings[1] == '\0')) {
@@ -778,8 +775,8 @@ printf("ccc-%s\n", user_input_strings);
              if ((user_input_strings[0] != 'y') && // 入力された文字がyかn以外
 																	(user_input_strings[0] != 'n')) {
                 //  (user_input_strings[1] == '\0')) 
-                 memset(user_input_strings, '\0',
-                 sizeof(user_input_strings)); // ユーザ入力文字格納変数初期化
+              memset(user_input_strings, '\0',
+              sizeof(user_input_strings)); // ユーザ入力文字格納変数初期化
                   
               XmbDrawString(disp, user_input_moniter, ja_fs, gc2,
                            (input_position + 9), 48, error_select_all_put_question_str1,
@@ -790,11 +787,12 @@ printf("ccc-%s\n", user_input_strings);
               input_position = 0;
               user_input_strings[char_cnt] = key_sym;
               char_cnt++;
-             } else if ((user_input_strings[0] == 'y') && // 全問出題選択画面y押下
-                        (user_input_strings[1] == '\0')) {
-               memset(user_input_strings, '\0',
-               sizeof(user_input_strings)); // ユーザ入力文字格納変数初期化
-               number_of_end_question = question_max;
+             }
+             else if ((user_input_strings[0] == 'y') && // 全問出題選択画面y押下
+                     (user_input_strings[1] == '\0')) {
+              memset(user_input_strings, '\0',
+              sizeof(user_input_strings)); // ユーザ入力文字格納変数初期化
+              number_of_end_question = question_max;
         //       ClearQuestionMoniter();
 
 
@@ -802,107 +800,151 @@ printf("number_of_start_question is %d\n", number_of_start_question);
 printf("number_of_end_question is %d\n", number_of_end_question);
 
 /*全問出題開始*/
-               for (cnt = number_of_start_question,
-                cnt1 = 1; cnt < number_of_end_question;
-                cnt++, cnt1++) {
-                sprintf(cnt_str1, "%d    ", cnt1);
-                sprintf(line_number_str, "%ld", answer_and_question_s[cnt].number);
-                strcat(qput_question_number_str, cnt_str1);
-																strcat(qput_line_number_str, line_number_str);
-                strcat(qput_question_str, answer_and_question_s[cnt].question);
-                sprintf(qput_str1, "%s%s", qput_question_number_str, qput_line_number_str);
+              for (cnt = number_of_start_question,
+               cnt1 = 1; cnt < number_of_end_question;
+               cnt++, cnt1++) {
+               sprintf(cnt_str1, "%d    ", cnt1);
+               sprintf(line_number_str, "%ld", answer_and_question_s[cnt].number);
+               strcat(qput_question_number_str, cnt_str1);
+															strcat(qput_line_number_str, line_number_str);
+               strcat(qput_question_str, answer_and_question_s[cnt].question);
+               sprintf(qput_str1, "%s%s", qput_question_number_str, qput_line_number_str);
 
-                ClearQuestionMoniter();
-                XDrawString(disp, question_moniter, gc2, 3, 13, qput_str1,
-                           strlen(qput_str1));
-                XmbDrawString(disp, question_moniter, ja_fs, gc2, 3, 30,
-                             qput_question_str,
-                             strlen(qput_question_str));
+               ClearQuestionMoniter();
+               XDrawString(disp, question_moniter, gc2, 3, 13, qput_str1,
+                          strlen(qput_str1));
+               XmbDrawString(disp, question_moniter, ja_fs, gc2, 3, 30,
+                            qput_question_str,
+                            strlen(qput_question_str));
                           
 printf("%s%s\n", qput_question_number_str, qput_line_number_str);
 printf("%s\n", qput_str1);
 printf("%s\n", qput_question_str);
 
-                strcpy(qput_question_number_str, "question number : ");
-                strcpy(qput_line_number_str, "line number : ");
-                strcpy(qput_question_str, "Q : ");
-                memset(qput_str1, '\0', sizeof(qput_str1));
+               strcpy(qput_question_number_str, "question number : ");
+               strcpy(qput_line_number_str, "line number : ");
+               strcpy(qput_question_str, "Q : ");
+               memset(qput_str1, '\0', sizeof(qput_str1));
 
-                while (1) {
-																 XNextEvent(disp, &event);
+               while (1) {
+															 XNextEvent(disp, &event);
                             
-                 if (event.type ==  KeyPress) { // 出題ファイル選択画面　入力待受
-                  t_cnt = XmbLookupString(ic, (XKeyPressedEvent*)&event, // キーシムと文字列の両方を返している
-                  buffer, sizeof(buffer), &key_sym, &status);
+                if (event.type ==  KeyPress) { // 出題ファイル選択画面　入力待受
+                 t_cnt = XmbLookupString(ic, (XKeyPressedEvent*)&event, // キーシムと文字列の両方を返している
+                 buffer, sizeof(buffer), &key_sym, &status);
 
-                  if(key_sym == XK_Escape){
-                   ExitProgram();
-                  }
-
-                  XLookupString((XKeyEvent *)&event, NULL, sizeof(key_sym),
-                  &key_sym, NULL);
-
-                  if (key_sym == XK_Delete || key_sym == XK_BackSpace) {
-                   DeleteCharacter();
-                  } else if ((status == XLookupChars || status == XLookupBoth) &&
-                   !(key_sym == XK_Return)) {
-            //      XClearArea(disp, user_input_moniter, 8, 35, 440, 16, False); // この行とこの下の行は一回の呼び出しにまとめる
-//                  XClearArea(disp, user_input_moniter, 8, 55, 440, 16, False);
-                   XmbDrawString(disp, user_input_moniter, ja_fs, gc2,
-                                (input_position + 16), 28, buffer, t_cnt);
-                   input_position += 7;
-                   user_input_strings[char_cnt] = key_sym;
-                   char_cnt++;
-                  } else if (key_sym == XK_Return) {
-                   UserInputMoniterClear();
-                   XClearArea(disp, user_input_moniter, 7, 30, 400, 58, False);
-
-                   if (!strcmp(answer_and_question_s[cnt].answer, user_input_strings)){
-                    XDrawString(disp, user_input_moniter, gc2, (input_position + 9),
-                               48, "correct!!", 9);
-                    XDrawString(disp, user_input_moniter, gc2, (input_position + 9),
-                               68, "A:", 2);
-                    XDrawString(disp, user_input_moniter, gc2, (input_position + 9 + 7 + 7),
-                               68, answer_and_question_s[cnt].answer, 
-                               strlen(answer_and_question_s[cnt].answer));
-                   } else {
-                    XDrawString(disp, user_input_moniter, gc2, (input_position + 9),
-                               48, "miss!!", 6);
-                    XDrawString(disp, user_input_moniter, gc2, (input_position + 9),
-                               68, "A: ", 2);
-                    XDrawString(disp, user_input_moniter, gc2, (input_position + 9 + 7 + 7),
-                               68, answer_and_question_s[cnt].answer,
-                               strlen(answer_and_question_s[cnt].answer));
-                    cnt1--, cnt--;
-                   }
-
-                   memset(user_input_strings, '\0', sizeof(user_input_strings));
-                   char_cnt = 0;
-                   break;
-                  }
-printf("%s\n", user_input_strings);
+                 if(key_sym == XK_Escape){
+                  ExitProgram();
                  }
+
+                 XLookupString((XKeyEvent *)&event, NULL, sizeof(key_sym),
+                 &key_sym, NULL);
+
+                 if (key_sym == XK_Delete || key_sym == XK_BackSpace) {
+                  DeleteCharacter();
+                 } else if ((status == XLookupChars || status == XLookupBoth) &&
+                  !(key_sym == XK_Return)) {
+                  XmbDrawString(disp, user_input_moniter, ja_fs, gc2,
+                               (input_position + 16), 28, buffer, t_cnt);
+                  input_position += 7;
+                  user_input_strings[char_cnt] = key_sym;
+                  char_cnt++;
+                 } else if (key_sym == XK_Return) {
+                  UserInputMoniterClear();
+                  XClearArea(disp, user_input_moniter, 7, 30, 400, 58, False);
+
+                  if (!strcmp(answer_and_question_s[cnt].answer, user_input_strings)){
+                   XDrawString(disp, user_input_moniter, gc2, (input_position + 9),
+                              48, "correct!!", 9);
+                   XDrawString(disp, user_input_moniter, gc2, (input_position + 9),
+                              68, "A:", 2);
+                   XDrawString(disp, user_input_moniter, gc2, (input_position + 9 + 7 + 7),
+                              68, answer_and_question_s[cnt].answer, 
+                              strlen(answer_and_question_s[cnt].answer));
+                  } else {
+                   XDrawString(disp, user_input_moniter, gc2, (input_position + 9),
+                              48, "miss!!", 6);
+                   XDrawString(disp, user_input_moniter, gc2, (input_position + 9),
+                              68, "A: ", 2);
+                   XDrawString(disp, user_input_moniter, gc2, (input_position + 9 + 7 + 7),
+                              68, answer_and_question_s[cnt].answer,
+                              strlen(answer_and_question_s[cnt].answer));
+                   cnt1--, cnt--;
+                  }
+
+                  memset(user_input_strings, '\0', sizeof(user_input_strings));
+                  char_cnt = 0;
+                  break;
+                 }
+printf("%s\n", user_input_strings);
+                }
+               }
+              }
+
+              ClearQuestionMoniter();
+              XDrawString(disp, question_moniter, gc2, 3, 13,
+                         "questions are all finished. do you retry? (y/n)",
+                         strlen("questions are all finished. do you retry? (y/n)"));
+              XmbDrawString(disp, question_moniter, ja_fs, gc2, 3, 30,
+                           "出題が終わりました。プログラムを終了しますか? (y/n)",
+                           strlen("出題が終わりました。プログラムを終了しますか? (y/n)"));
+
+              while (1) {
+               XNextEvent(disp, &event);
+                            
+               if (event.type ==  KeyPress) { // 出題ファイル選択画面　入力待受
+                printf("while-1_KeyPress\n");
+                t_cnt = XmbLookupString(ic, (XKeyPressedEvent*)&event, // キーシムと文字列の両方を返している
+                buffer, sizeof(buffer), &key_sym, &status);
+
+                if(key_sym == XK_Escape){
+                 ExitProgram();
                 }
 
-                ClearQuestionMoniter();
-                XDrawString(disp, question_moniter, gc2, 3, 13,
-                           "questions are all finished. do you retry? (y/n)",
-                           strlen("questions are all finished. do you retry? (y/n)"));
-                XmbDrawString(disp, question_moniter, ja_fs, gc2, 3, 30,
-                             "出題が終わりました。プログラムを終了しますか? (y/n)",
-                             strlen("出題が終わりました。プログラムを終了しますか? (y/n)"));
+                XLookupString((XKeyEvent *)&event, NULL, sizeof(key_sym),
+                             &key_sym, NULL);
 
-             //   while (1) {
-                 
-              //  }
+                if (key_sym == XK_Delete || key_sym == XK_BackSpace) {
+                 DeleteCharacter();
+                }
+                else if ((status == XLookupChars || status == XLookupBoth) &&
+                        !(key_sym == XK_Return)) {
+                 XClearArea(disp, user_input_moniter, 8, 35, 440, 16, False); // この行とこの下の行は一回の呼び出しにまとめる
+                 XClearArea(disp, user_input_moniter, 8, 55, 440, 16, False);
+                 XClearArea(disp, user_input_moniter, 8, 75, 440, 16, False);
+                 XmbDrawString(disp, user_input_moniter, ja_fs, gc2,
+                              (input_position + 16), 28, buffer, t_cnt);
+                 input_position += 7;
+                 user_input_strings[char_cnt] = key_sym;
+                 char_cnt++;
+                }
+                else if (key_sym == XK_Return) {
+                 UserInputMoniterClear();
+                 char_cnt = 0;
+/* 入力エラーチェック */
+                 if ((user_input_strings[0] != 'y') && // 入力された文字がyかn以外
+ 															   	(user_input_strings[0] != 'n')) {
+                  memset(user_input_strings, '\0', sizeof(user_input_strings));
+                  XmbDrawString(disp, user_input_moniter, ja_fs, gc2,
+                               (input_position + 9), 48, error_select_all_put_question_str1,
+                               strlen(error_select_all_put_question_str1));
+                  XmbDrawString(disp, user_input_moniter, ja_fs, gc2,
+                               (input_position + 9), 68, error_check_strings2,
+                               strlen(error_check_strings2));
+                  input_position = 0;
+                  user_input_strings[char_cnt] = key_sym;
+                  char_cnt++;
+                 }
+                }
                }
-              } else if ((user_input_strings[0] == 'n') &&
-                 (user_input_strings[1] == '\0')) {
-                 memset(user_input_strings, '\0',
-                 sizeof(user_input_strings)); // ユーザ入力文字格納変数初期化
-                 ClearQuestionMoniter();
-printf("bbbb\n");
-ExitProgram();
+               break;
+              }
+             }
+             else if ((user_input_strings[0] == 'n') &&
+              (user_input_strings[1] == '\0')) {
+               memset(user_input_strings, '\0',
+               sizeof(user_input_strings)); // ユーザ入力文字格納変数初期化
+               ClearQuestionMoniter();
              }
             }
            }
@@ -920,4 +962,3 @@ ExitProgram();
 //    exit(EXIT_SUCCESS);
  }
 }
-
