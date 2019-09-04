@@ -885,8 +885,11 @@ printf("%s\n", user_input_strings);
                          "questions are all finished. do you retry? (y/n)",
                          strlen("questions are all finished. do you retry? (y/n)"));
               XmbDrawString(disp, question_moniter, ja_fs, gc2, 3, 30,
-                           "出題が終わりました。プログラムを終了しますか? (y/n)",
-                           strlen("出題が終わりました。プログラムを終了しますか? (y/n)"));
+                           "出題が終わりました。プログラムを終了しますか?",
+                           strlen("出題が終わりました。プログラムを終了しますか?"));
+              XmbDrawString(disp, question_moniter, ja_fs, gc2, 3, 50,
+                           "r でもう一度同じ内容で出題します。(r/y/n)",
+                           strlen("r でもう一度同じ内容で出題します。(r/y/n)"));
 
               while (1) {
                XNextEvent(disp, &event);
@@ -950,10 +953,22 @@ printf("%s\n", user_input_strings);
                    //char_cnt++;
                    ExitProgram();
                    exit(EXIT_SUCCESS);
-																	}
+                  } else if ((user_input_strings[0] == 'n')  &&
+                            (user_input_strings[1] == '\0')) {
+                   memset(user_input_strings, '\0', sizeof(user_input_strings));
+                   input_position = 0;
+                   user_input_strings[char_cnt] = key_sym;
+                   char_cnt++;
+                   ClearQuestionMoniter();
+                   break;
+                  }
+                 break;
                 }
+                break;
                }
+               break;
               }
+              break;
              }
              else if ((user_input_strings[0] == 'n') &&
               (user_input_strings[1] == '\0')) {
