@@ -149,7 +149,6 @@ void DeleteCharacter() {
 };
 
 void ExitProgram() {
- printf("ProgramExit\n");
  XCloseIM(im);
  XDestroyWindow(disp, root);
  XCloseDisplay(disp);
@@ -893,7 +892,7 @@ printf("%s\n", user_input_strings);
                XNextEvent(disp, &event);
                             
                if (event.type ==  KeyPress) { // 出題ファイル選択画面　入力待受
-                printf("while-1_KeyPress\n");
+                printf("while-4_KeyPress\n");
                 t_cnt = XmbLookupString(ic, (XKeyPressedEvent*)&event, // キーシムと文字列の両方を返している
                 buffer, sizeof(buffer), &key_sym, &status);
 
@@ -921,23 +920,39 @@ printf("%s\n", user_input_strings);
                 else if (key_sym == XK_Return) {
                  UserInputMoniterClear();
                  char_cnt = 0;
+/*リトライ選択画面*/
 /* 入力エラーチェック */
-                 if ((user_input_strings[0] != 'y') && // 入力された文字がyかn以外
- 															   	(user_input_strings[0] != 'n')) {
-                  memset(user_input_strings, '\0', sizeof(user_input_strings));
-                  XmbDrawString(disp, user_input_moniter, ja_fs, gc2,
-                               (input_position + 9), 48, error_select_all_put_question_str1,
-                               strlen(error_select_all_put_question_str1));
-                  XmbDrawString(disp, user_input_moniter, ja_fs, gc2,
-                               (input_position + 9), 68, error_check_strings2,
-                               strlen(error_check_strings2));
-                  input_position = 0;
-                  user_input_strings[char_cnt] = key_sym;
-                  char_cnt++;
-                 }
+                  if (((((user_input_strings[0] != 'y') || // 入力された文字がyかnかr以外
+ 															    	(user_input_strings[0] != 'n')) ||
+ 															    	(user_input_strings[0] != 'r'))) &&
+                     (user_input_strings[1] != '\0')) {
+                   memset(user_input_strings, '\0', sizeof(user_input_strings));
+                   XmbDrawString(disp, user_input_moniter, ja_fs, gc2,
+                                (input_position + 9), 48, "yかnかrを入力して下さい",
+                                strlen("yかnかrを入力して下さい"));
+                   XmbDrawString(disp, user_input_moniter, ja_fs, gc2,
+                                (input_position + 9), 68, error_check_strings2,
+                                strlen(error_check_strings2));
+                   input_position = 0;
+                   user_input_strings[char_cnt] = key_sym;
+                   char_cnt++;
+                  } else if ((user_input_strings[0] == 'r') &&
+                            (user_input_strings[0] == '\0')) {
+                   memset(user_input_strings, '\0', sizeof(user_input_strings));
+                   input_position = 0;
+                   user_input_strings[char_cnt] = key_sym;
+                   char_cnt++;
+                  } else if ((user_input_strings[0] == 'y')  &&
+                            (user_input_strings[1] == '\0')) {
+                   //memset(user_input_strings, '\0', sizeof(user_input_strings));
+                   //input_position = 0;
+                   //user_input_strings[char_cnt] = key_sym;
+                   //char_cnt++;
+                   ExitProgram();
+                   exit(EXIT_SUCCESS);
+																	}
                 }
                }
-               break;
               }
              }
              else if ((user_input_strings[0] == 'n') &&
@@ -957,8 +972,7 @@ printf("%s\n", user_input_strings);
     }
    }
   }
-  printf("MainExit\n");
   ExitProgram();
-//    exit(EXIT_SUCCESS);
+  exit(EXIT_SUCCESS);
  }
 }
