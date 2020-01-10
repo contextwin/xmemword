@@ -1,6 +1,6 @@
 #!まだ正常に動作しません！
 
-git clone https://github.com/contextwin/cmemword.git
+git clone https://github.com/contextwin/xmemword.git
 
 実行要件:
 xmemwrdがビルトインの機能しかインストールされていないlinuxで動作するかはまだ検証しておりません。

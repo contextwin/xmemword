@@ -429,8 +429,8 @@ int main(int argc, char **argv) {
   XFlush(disp);
 
   while (1) {
+printf("start menu moniter roop in.\n");
    XNextEvent(disp, &event);
-
    if (event.type == Expose) {
     memset(user_input_strings, '\0', sizeof(user_input_strings));
 
@@ -487,7 +487,7 @@ int main(int argc, char **argv) {
 
     if(key_sym == XK_Delete || key_sym == XK_BackSpace) {
      DeleteCharacter();
-     printf("w1_D_%s\n", user_input_strings);
+printf("w1_D_%s\n", user_input_strings);
     } else if ((status == XLookupChars || status == XLookupBoth) &&
               !(key_sym == XK_Return)) {
      XmbDrawString(disp, user_input_moniter, ja_fs, gc2,
@@ -529,10 +529,9 @@ int main(int argc, char **argv) {
       }
 
       while(1) {
+printf("select questions-file moniter roop in.\n");
        XNextEvent(disp, &event);
-                            
        if (event.type ==  KeyPress) { // 出題ファイル選択画面　入力待受
-        printf("while-1_KeyPress\n");
         t_cnt = XmbLookupString(ic, (XKeyPressedEvent*)&event, // キーシムと文字列の両方を返している
                 buffer, sizeof(buffer), &key_sym, &status);
 
@@ -634,7 +633,6 @@ int main(int argc, char **argv) {
         }
 
        }
-/*出題ファイル選択画面 end*/
 
       }
 //出題順序選択画面 start
@@ -661,7 +659,6 @@ int main(int argc, char **argv) {
        XNextEvent(disp, &event);
                             
        if (event.type ==  KeyPress) { // 出題ファイル選択画面　入力待受
-        printf("while-1_KeyPress\n");
         t_cnt = XmbLookupString(ic, (XKeyPressedEvent*)&event, // キーシムと文字列の両方を返している
                 buffer, sizeof(buffer), &key_sym, &status);
 
@@ -738,14 +735,13 @@ int main(int argc, char **argv) {
 
           strcpy(select_all_put_question_str1, "出題数 / ");
 
-printf("ccc-%s\n", user_input_strings);
           memset(user_input_strings, '\0', sizeof(user_input_strings)); // ユーザ入力文字格納変数初期化
 
           while(1) {
+printf("select questions-file moniter roop in.\n");
            XNextEvent(disp, &event);
                             
            if (event.type ==  KeyPress) { // 出題ファイル選択画面　入力待受
-            printf("while-1_KeyPress\n");
             t_cnt = XmbLookupString(ic, (XKeyPressedEvent*)&event, // キーシムと文字列の両方を返している
                 buffer, sizeof(buffer), &key_sym, &status);
 
@@ -892,12 +888,12 @@ printf("%s\n", user_input_strings);
                            strlen("r でもう一度同じ内容で出題します。(r/y/n)"));
 
               while (1) {
+printf("retry roop in\n");
                XNextEvent(disp, &event);
                             
                if (event.type ==  KeyPress) { // 出題ファイル選択画面　入力待受
-                printf("while-4_KeyPress\n");
                 t_cnt = XmbLookupString(ic, (XKeyPressedEvent*)&event, // キーシムと文字列の両方を返している
-                buffer, sizeof(buffer), &key_sym, &status);
+                        buffer, sizeof(buffer), &key_sym, &status);
 
                 if(key_sym == XK_Escape){
                  ExitProgram();
@@ -919,12 +915,14 @@ printf("%s\n", user_input_strings);
                  input_position += 7;
                  user_input_strings[char_cnt] = key_sym;
                  char_cnt++;
+printf("%s\n", user_input_strings);
                 }
                 else if (key_sym == XK_Return) {
                  UserInputMoniterClear();
                  char_cnt = 0;
 /*リトライ選択画面*/
 /* 入力エラーチェック */
+printf("%s\n", user_input_strings);
                   if (((((user_input_strings[0] != 'y') || // 入力された文字がyかnかr以外
  															    	(user_input_strings[0] != 'n')) ||
  															    	(user_input_strings[0] != 'r'))) &&
@@ -941,34 +939,22 @@ printf("%s\n", user_input_strings);
                    char_cnt++;
                   } else if ((user_input_strings[0] == 'r') &&
                             (user_input_strings[0] == '\0')) {
-                   memset(user_input_strings, '\0', sizeof(user_input_strings));
-                   input_position = 0;
-                   user_input_strings[char_cnt] = key_sym;
-                   char_cnt++;
                   } else if ((user_input_strings[0] == 'y')  &&
                             (user_input_strings[1] == '\0')) {
-                   //memset(user_input_strings, '\0', sizeof(user_input_strings));
-                   //input_position = 0;
-                   //user_input_strings[char_cnt] = key_sym;
-                   //char_cnt++;
                    ExitProgram();
                    exit(EXIT_SUCCESS);
                   } else if ((user_input_strings[0] == 'n')  &&
                             (user_input_strings[1] == '\0')) {
+                   ClearQuestionMoniter();
                    memset(user_input_strings, '\0', sizeof(user_input_strings));
                    input_position = 0;
                    user_input_strings[char_cnt] = key_sym;
                    char_cnt++;
-                   ClearQuestionMoniter();
                    break;
                   }
-                 break;
                 }
-                break;
                }
-               break;
               }
-              break;
              }
              else if ((user_input_strings[0] == 'n') &&
               (user_input_strings[1] == '\0')) {
