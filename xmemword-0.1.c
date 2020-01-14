@@ -768,7 +768,7 @@ printf("select questions-file moniter roop in.\n");
              char_cnt = 0;
 /* 入力エラーチェック */
              if ((user_input_strings[0] != 'y') && // 入力された文字がyかn以外
-																	(user_input_strings[0] != 'n')) {
+			     (user_input_strings[0] != 'n')) {
                 //  (user_input_strings[1] == '\0')) 
               memset(user_input_strings, '\0',
               sizeof(user_input_strings)); // ユーザ入力文字格納変数初期化
@@ -924,8 +924,8 @@ printf("%s\n", user_input_strings);
 /* 入力エラーチェック */
 printf("%s\n", user_input_strings);
                   if (((((user_input_strings[0] != 'y') || // 入力された文字がyかnかr以外
- 															    	(user_input_strings[0] != 'n')) ||
- 															    	(user_input_strings[0] != 'r'))) &&
+                     (user_input_strings[0] != 'n')) ||
+                     (user_input_strings[0] != 'r'))) &&
                      (user_input_strings[1] != '\0')) {
                    memset(user_input_strings, '\0', sizeof(user_input_strings));
                    XmbDrawString(disp, user_input_moniter, ja_fs, gc2,
@@ -956,11 +956,22 @@ printf("%s\n", user_input_strings);
                }
               }
              }
-             else if ((user_input_strings[0] == 'n') &&
+             else if ((user_input_strings[0] == 'n') && //全問出題するかどうかでnを押下
               (user_input_strings[1] == '\0')) {
                memset(user_input_strings, '\0',
                sizeof(user_input_strings)); // ユーザ入力文字格納変数初期化
                ClearQuestionMoniter();
+               XmbDrawString(disp, question_moniter, ja_fs, gc2, 3, 13,
+                           "何問目から出題しますか?",
+                           strlen("何問目から出題しますか?"));
+               XmbDrawString(disp, question_moniter, ja_fs, gc2, 3, 30,
+                           "数値を入力して下さい。",
+                           strlen("数値を入力して下さい。"));
+               input_position = 0;
+               user_input_strings[char_cnt] = key_sym;
+               char_cnt++;
+
+	    //   for(;;){};
              }
             }
            }
