@@ -2,9 +2,6 @@
 
 git clone https://github.com/contextwin/xmemword.git
 
-実行要件:
-xmemwrdがビルトインの機能しかインストールされていないlinuxで動作するかはまだ検証しておりません。
-
 ビルド要件:
 xmemwordはビルド要件として、xorg-devに依存します。
 aptコマンドで導入する場合,
