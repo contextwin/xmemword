@@ -3,7 +3,10 @@
 git clone https://github.com/contextwin/xmemword.git
 
 ビルド要件:
-xmemwordはビルド要件として、xorg-devに依存します。
+xmemwordはビルド要件として、C言語のコンパイラに依存します。
+予めaptコマンドなどでgccやclangなどのコンパイラをインストールしておいてください。
+
+その他xmemwordはビルド要件として、xorg-devに依存します。
 aptコマンドで導入する場合,
 sudo apt install xorg-dev
 を実行して下さい。
