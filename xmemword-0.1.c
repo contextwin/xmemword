@@ -266,7 +266,7 @@ int main(int argc, char **argv) {
  char question_max_str[256];
  char select_all_put_question_str1[256] = "出題数 / ";
  char select_all_put_question_str2[256] = "全問出題しますか?";
- char *select_all_put_question_str3 = "(y/n)";
+ char *select_all_put_question_str3 = "(\"yes\" = y / \"no\" = n)を入力して下さい。";
  char *error_select_all_put_question_str1 = "yかnで入力して下さい。";
 
 /*出題数決定画面用*/
